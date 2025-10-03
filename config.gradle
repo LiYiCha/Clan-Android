@@ -1,0 +1,73 @@
+ext {
+    //android开发版本配置
+    android = [
+            compileSdkVersion: 36,
+            applicationId    : "com.yc.framework",
+            minSdkVersion    : 21,
+            targetSdkVersion : 36,
+            versionCode      : 1,
+            versionName      : "1.0.0",
+
+    ]
+
+    versions = [
+            "junit-version"     : "4.12",
+            "navigation_version": "2.7.7",
+            "room_version"      : "2.6.1",
+            "retrofit_version"  : "2.9.0",
+            "compose_version"   : "1.6.2",
+    ]
+
+    //support配置
+    android_x = [
+            'appcompat'           : "androidx.appcompat:appcompat:1.6.1",
+            "ktx"                 : "androidx.core:core-ktx:1.12.0",
+            'multidex'            : "androidx.multidex:multidex:2.0.1",
+            'startup'             : "androidx.startup:startup-runtime:1.1.1",
+            'material'            : "com.google.android.material:material:1.4.0",
+            //Google AAC
+            "lifecycle-viewmodel": "androidx.lifecycle:lifecycle-viewmodel:2.7.0",
+            "lifecycle-livedata": "androidx.lifecycle:lifecycle-livedata:2.7.0",
+            "lifecycle-compiler"  : "androidx.lifecycle:lifecycle-compiler:2.7.0",
+            //navigation
+            "navigation-ktx"      : "androidx.navigation:navigation-fragment-ktx:${versions["navigation_version"]}",
+            "navigation-ui-ktx"   : "androidx.navigation:navigation-ui-ktx:${versions["navigation_version"]}",
+            //room
+            "room"                : "androidx.room:room-runtime:${versions["room_version"]}",
+            "room-ktx"            : "androidx.room:room-ktx:${versions["room_version"]}",
+            "room-compiler"       : "androidx.room:room-compiler:${versions["room_version"]}",
+            //compose
+            "compose-ui"          : "androidx.compose.ui:ui:${versions["compose_version"]}",
+            "compose-material"    : "androidx.compose.material:material:${versions["compose_version"]}",
+            "compose-preview"     : "androidx.compose.ui:ui-tooling-preview:${versions["compose_version"]}"
+    ]
+
+    //依赖第三方配置
+    dependencies = [
+            //阿里路由框架
+            "arouter-api"                  : "com.alibaba:arouter-api:1.5.2",
+            "arouter-compiler"             : "com.alibaba:arouter-compiler:1.5.2",
+            // 6.0权限请求
+            "permissionx"                  : "com.guolindev.permissionx:permissionx:1.7.1",
+            //万能adapter适配器
+            "BaseRecyclerViewAdapterHelper": "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7",
+            //消息总线框架,基于LiveData
+            "liveEventBus"                 : 'io.github.jeremyliao:live-event-bus-x:1.8.0',
+            //防止崩溃框架
+            "customactivityoncrash"        : 'cat.ereza:customactivityoncrash:2.4.0',
+            //network
+            "okhttp"                       : "com.squareup.okhttp3:okhttp:4.12.0",
+            "retrofit"                     : "com.squareup.retrofit2:retrofit:${versions["retrofit_version"]}",
+            "converter-gson"               : "com.squareup.retrofit2:converter-gson:${versions["retrofit_version"]}",
+            "adapter-rxjava"               : "com.squareup.retrofit2:adapter-rxjava3:${versions["retrofit_version"]}",
+            //coil图片加载
+            "coil"                         : "io.coil-kt:coil:2.6.0",
+            //json解析
+            "gson"                         : "com.google.code.gson:gson:2.10.1",
+            'junit'                        : "junit:junit:${versions["junit-version"]}",
+
+
+    ]
+}
+
+

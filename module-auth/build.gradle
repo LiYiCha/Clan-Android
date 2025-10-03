@@ -1,0 +1,49 @@
+plugins {
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+apply from: "../module.build.gradle"
+android {
+
+    buildFeatures {
+        viewBinding true
+    }
+    defaultConfig {
+        //如果是独立模块，则使用当前组件的包名
+        if (isBuildModule.toBoolean()) {
+            applicationId "com.yc.auth"
+        }
+    }
+    //统一资源前缀，规范资源引用
+    resourcePrefix "test_"
+    namespace 'com.yc.auth'
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+}
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+    }
+}
+dependencies {
+    api(project(":library-base"))
+    // 基础依赖
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    // Lifecycle依赖
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    // 协程依赖
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    // 测试依赖
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+}

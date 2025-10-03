@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- LoginActivity的Material主题 -->
+    <style name="LoginMaterialTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar" tools:ignore="ResourceName">
+        <!-- 隐藏ActionBar -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- 状态栏透明 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 窗口背景 -->
+        <item name="android:windowBackground">@android:color/white</item>
+        <!-- 主色调 -->
+        <item name="colorPrimary">#4CAF50</item>
+        <item name="colorPrimaryDark">#388E3C</item>
+        <item name="colorAccent">#4CAF50</item>
+    </style>
+</resources>

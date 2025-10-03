@@ -1,0 +1,76 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+android {
+    namespace 'com.rui.mvvmlazy'
+    compileSdk rootProject.ext.android.compileSdkVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+    }
+    buildFeatures {
+        dataBinding = true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget =JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+
+    //沉浸式框架
+    api 'com.geyifeng.immersionbar:immersionbar:3.2.2'
+    // kotlin扩展（可选）
+    api 'com.geyifeng.immersionbar:immersionbar-ktx:3.2.2'
+    //通用标题栏
+    api 'com.github.getActivity:TitleBar:10.5'
+    //万能分割线
+    api 'com.github.fondesa:recycler-view-divider:3.6.0'
+    // 上拉加载，下拉刷新
+    api 'io.github.scwang90:refresh-layout-kernel:2.1.0'      //核心必须依赖
+    api 'io.github.scwang90:refresh-header-classics:2.1.0'    //经典刷新头
+    api "org.jetbrains.anko:anko:0.10.8"
+    //dialog框架
+    api 'com.github.li-xiaojun:XPopup:2.10.0'
+    api 'com.github.li-xiaojun:XPopupExt:1.0.1'
+    api rootProject.ext.dependencies["BaseRecyclerViewAdapterHelper"]
+    //android_x
+    api rootProject.ext.android_x["multidex"]
+    api rootProject.ext.android_x["appcompat"]
+    api rootProject.ext.android_x["ktx"]
+    api rootProject.ext.android_x["material"]
+    api rootProject.ext.android_x["navigation-ktx"]
+    api rootProject.ext.android_x["navigation-ui-ktx"]
+    api rootProject.ext.android_x["startup"]
+    //room
+    api rootProject.ext.android_x["room"]
+    api rootProject.ext.android_x["room-ktx"]
+
+    //network
+    api rootProject.ext.dependencies["okhttp"]
+    api rootProject.ext.dependencies["retrofit"]
+
+    api rootProject.ext.dependencies["converter-gson"]
+    //json解析
+    api rootProject.ext.dependencies["gson"]
+    //coil图片加载库
+    api rootProject.ext.dependencies["coil"]
+    //Google LiveData和ViewModel组件
+    api rootProject.ext.android_x["lifecycle-viewmodel"]
+    api rootProject.ext.android_x["lifecycle-livedata"]
+    kapt rootProject.ext.android_x["lifecycle-compiler"]
+
+}
