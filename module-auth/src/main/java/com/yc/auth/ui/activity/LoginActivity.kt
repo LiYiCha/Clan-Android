@@ -74,6 +74,7 @@ class LoginActivity : AppCompatActivity() {
                     binding.btnLogin.isEnabled = true
                     val loginData = result.data
                     if (loginData.success) {
+
                         Toast.makeText(this, "登录成功 ", Toast.LENGTH_SHORT).show()
                         // 跳转到主页面
                     } else {
