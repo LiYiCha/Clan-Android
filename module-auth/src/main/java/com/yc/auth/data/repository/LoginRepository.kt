@@ -6,6 +6,9 @@ import com.yc.auth.data.source.remote.dto.LoginRequest
 import com.yc.auth.data.source.remote.dto.LoginResponse
 import com.yc.auth.util.CommonResult
 
+/**
+ * 登录仓库
+ */
 class LoginRepository {
     // 统一管理所有API接口
     private val authApi by lazy{

@@ -45,7 +45,7 @@ class LoginViewModel : BaseViewModel() {
             },
             resultState = loginResult,
             isShowDialog = true,
-            loadingMessage = "登录中..."
+            loadingMessage = "登录中... "
         )
     }
 }
