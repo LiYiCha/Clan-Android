@@ -1,64 +1,51 @@
 package com.yc.auth.ui.viewmodel
 
-import android.util.Log
-import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.rui.mvvmlazy.base.BaseViewModel
+import com.rui.mvvmlazy.ext.request
+import com.rui.mvvmlazy.ext.requestNoCheck
+import com.rui.mvvmlazy.state.ResultState
+import com.yc.auth.data.repository.LoginRepository
 import com.yc.auth.data.source.remote.dto.LoginResponse
 import com.yc.auth.util.CommonResult
-import kotlinx.coroutines.launch
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel : BaseViewModel() {
 
-    private val _username = MutableLiveData<String>()
-    val username: LiveData<String> = _username
+    // 用户名输入
+    val username = MutableLiveData<String>()
 
-    private val _password = MutableLiveData<String>()
-    val password: LiveData<String> = _password
+    // 密码输入
+    val password = MutableLiveData<String>()
 
-    private val _loginResult = MutableLiveData<CommonResult<LoginResponse>>()
-    val loginResult: LiveData<CommonResult<LoginResponse>> = _loginResult
+    // 登录结果
+    val loginResult = MutableLiveData< ResultState<CommonResult<LoginResponse>>>()
 
-    private val _loading = MutableLiveData<Boolean>()
-    val loading: LiveData<Boolean> = _loading
+    // 错误信息
+    val errorMessage = MutableLiveData<String>()
 
-    private val _errorMessage = MutableLiveData<String>()
-    val errorMessage: LiveData<String> = _errorMessage
+    // 登录仓库
+    private val repository by lazy { LoginRepository() }
 
-    // 设置用户名
-    fun setUsername(username: String) {
-        _username.value = username
-    }
-
-    // 设置密码
-    fun setPassword(password: String) {
-        _password.value = password
-    }
-
-    // 执行登录
+    /**
+     * 执行登录
+     */
     fun login() {
-        val username = _username.value ?: return
-        val password = _password.value ?: return
+        val usernameValue = username.value ?: ""
+        val passwordValue = password.value ?: ""
 
-        if (username.isEmpty() || password.isEmpty()) {
-            _errorMessage.value = "请填写完整信息"
+        if (usernameValue.isEmpty() || passwordValue.isEmpty()) {
+            errorMessage.value = "请填写完整信息"
             return
         }
 
-        _loading.value = true
-        viewModelScope.launch {
-            try {
-                Log.d("LoginViewModel", "登录: $username, $password")
-                // 这里需要注入 AuthApi
-                // val response = authApi.login(LoginRequest(username, password))
-                // _loginResult.value = response
-            } catch (e: Exception) {
-                _errorMessage.value = "登录失败: ${e.message}"
-            } finally {
-                _loading.value = false
-            }
-        }
+        // 使用项目提供的request扩展函数进行网络请求
+        requestNoCheck(
+            block = {
+                repository.login(usernameValue, passwordValue)
+            },
+            resultState = loginResult,
+            isShowDialog = true,
+            loadingMessage = "登录中..."
+        )
     }
 }

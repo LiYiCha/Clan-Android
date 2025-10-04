@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.rui.mvvmlazy.state.ResultState
 import com.yc.auth.databinding.ActivityLoginBinding
 import com.yc.auth.ui.viewmodel.LoginViewModel
 
@@ -33,12 +34,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        // 文本输入监听
+        // 文本输入监听 - 现在可以直接观察MutableLiveData
         binding.etUsername.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                viewModel.setUsername(s.toString())
+                viewModel.username.value = s.toString()
             }
         })
 
@@ -46,7 +47,7 @@ class LoginActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                viewModel.setPassword(s.toString())
+                viewModel.password.value = s.toString()
             }
         })
 
@@ -55,10 +56,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.loading.observe(this) { isLoading ->
-            binding.btnLogin.isEnabled = !isLoading
-        }
-
+        // 观察错误信息
         viewModel.errorMessage.observe(this) { errorMessage ->
             if (errorMessage.isNotEmpty()) {
                 binding.tvError.text = errorMessage
@@ -66,11 +64,28 @@ class LoginActivity : AppCompatActivity() {
         }
 
         viewModel.loginResult.observe(this) { result ->
-            if (result != null && result.success) {
-                Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
-                // 跳转到主页面
-            } else if (result != null) {
-                binding.tvError.text = result.message
+            when(result){
+                is ResultState.Loading -> {
+                    // 显示加载中
+                    binding.btnLogin.isEnabled = false
+                }
+                is ResultState.Success -> {
+                    // 登录成功
+                    binding.btnLogin.isEnabled = true
+                    val loginData = result.data
+                    if (loginData.success) {
+                        Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
+                        // 跳转到主页面
+                    } else {
+                        // 登录失败，显示错误信息
+                        binding.tvError.text = loginData.message
+                    }
+                }
+                is ResultState.Error -> {
+                    // 登录失败
+                    binding.btnLogin.isEnabled = true
+                    binding.tvError.text = result.error.errorMsg
+                }
             }
         }
     }
