@@ -1,4 +1,4 @@
-package com.example.verificationcodedemo.model
+package com.yc.captcha.model
 
 /**
  * Date:2020/4/30

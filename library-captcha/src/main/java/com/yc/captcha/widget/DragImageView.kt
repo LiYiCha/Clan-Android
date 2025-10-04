@@ -1,4 +1,4 @@
-package com.example.verificationcodedemo.widget
+package com.yc.captcha.widget
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -13,10 +13,14 @@ import android.view.animation.LinearInterpolator
 import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import android.widget.SeekBar
-import com.example.verificationcodedemo.R
-import com.example.verificationcodedemo.utils.DisplayUtil
-import com.example.verificationcodedemo.utils.DisplayUtil.px2dip
-import kotlinx.android.synthetic.main.drag_view.view.*
+import android.widget.TextView
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.os.Handler
+import android.os.Looper
+import com.yc.captcha.R
+import com.yc.captcha.utils.DisplayUtil
+import com.yc.captcha.utils.DisplayUtil.px2dip
 
 /**
  * Date:2020/5/6
@@ -32,6 +36,15 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     private var cover: Bitmap? = null
     private var block: Bitmap? = null
 
+    // 视图组件
+    private var drag_tv_tips: DiyStyleTextView? = null
+    private var drag_tv_tips2: TextView? = null
+    private var drag_iv_cover: ImageView? = null
+    private var drag_iv_block: ImageView? = null
+    private var drag_fl_content: RelativeLayout? = null
+    private var drag_v_flash: View? = null
+    private var handler: Handler? = null
+
     //===================seekbar监听===================
     private var timeTemp: Long = 0
     private var timeUse: Float = 0.toFloat()
@@ -40,16 +53,16 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     private val resetRun = Runnable {
         tipsShowAnime(false)
         tips2ShowAnime(true)
-        sb!!.isEnabled = true
+        sb?.isEnabled = true
 
-        val position = sb!!.progress
+        val position = sb?.progress ?: 0
         val animator = ValueAnimator.ofFloat(1f, 0.0f)
         animator.setDuration(animeTime.toLong()).start()
         animator.addUpdateListener { animation ->
             val f = animation.animatedValue as Float
-            sb!!.progress = (position * f).toInt()
+            sb?.progress = (position * f).toInt()
             setSbThumb(R.drawable.drag_btn_n)
-            sb!!.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
+            sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
         }
     }
 
@@ -74,11 +87,21 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
 
     private fun init() {
         View.inflate(context, R.layout.drag_view, this)
-        //设置需要字体颜色为红色的内容
-        drag_tv_tips!!.setColorRegex("拼图|成功|失败|正确|[\\d\\.%]+", -0x8aeaf)
+
+        // 初始化视图组件
+        drag_tv_tips = findViewById(R.id.drag_tv_tips)
+        drag_tv_tips2 = findViewById(R.id.drag_tv_tips2)
+        drag_iv_cover = findViewById(R.id.drag_iv_cover)
+        drag_iv_block = findViewById(R.id.drag_iv_block)
+        drag_fl_content = findViewById(R.id.drag_fl_content)
+        drag_v_flash = findViewById(R.id.drag_v_flash)
         sb = findViewById(R.id.drag_sb)
-        sb!!.max = context.resources.displayMetrics.widthPixels
-        sb!!.setOnSeekBarChangeListener(this)
+        handler = Handler(Looper.getMainLooper())
+
+        //设置需要字体颜色为红色的内容
+        drag_tv_tips?.setColorRegex("拼图|成功|失败|正确|[\\d\\.%]+", -0x8aeaf)
+        sb?.max = context.resources.displayMetrics.widthPixels
+        sb?.setOnSeekBarChangeListener(this)
         reset()
     }
 
@@ -95,17 +118,17 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
 
         val w = cover.width
         val h = cover.height
-        val l = drag_iv_cover!!.layoutParams
-        l.width = DisplayUtil.dip2px(context, w.toFloat())
-        l.height = DisplayUtil.dip2px(context, h.toFloat())
-        drag_iv_cover!!.layoutParams = l
-        drag_iv_cover!!.setImageBitmap(cover)
+        val l = drag_iv_cover?.layoutParams
+        l?.width = DisplayUtil.dip2px(context, w.toFloat())
+        l?.height = DisplayUtil.dip2px(context, h.toFloat())
+        drag_iv_cover?.layoutParams = l
+        drag_iv_cover?.setImageBitmap(cover)
 
-        val l2 = drag_iv_block!!.layoutParams as ViewGroup.MarginLayoutParams
-        l2.height = DisplayUtil.dip2px(context, block.height.toFloat())
-        l2.width = DisplayUtil.dip2px(context, block.width.toFloat())
-        drag_iv_block!!.layoutParams = l2
-        drag_iv_block!!.setImageBitmap(block)
+        val l2 = drag_iv_block?.layoutParams as? ViewGroup.MarginLayoutParams
+        l2?.height = DisplayUtil.dip2px(context, block.height.toFloat())
+        l2?.width = DisplayUtil.dip2px(context, block.width.toFloat())
+        drag_iv_block?.layoutParams = l2
+        drag_iv_block?.setImageBitmap(block)
         setLocation(1f * cover.width / cover.height, cover.width)
     }
 
@@ -119,10 +142,10 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         post {
             val w = cover_w
             val h = (w / cover_wph).toInt()
-            val l = drag_fl_content!!.layoutParams
-            l.width = DisplayUtil.dip2px(context, w.toFloat())
-            l.height = DisplayUtil.dip2px(context, h.toFloat())
-            drag_fl_content!!.layoutParams = l
+            val l = drag_fl_content?.layoutParams
+            l?.width = DisplayUtil.dip2px(context, w.toFloat())
+            l?.height = DisplayUtil.dip2px(context, h.toFloat())
+            drag_fl_content?.layoutParams = l
         }
 
     }
@@ -136,55 +159,55 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
             penset = (99 - 0 / 0.1f).toInt()
         }
         if (penset < 1) penset = 1
-        drag_tv_tips!!.text = String.format("拼图成功: 耗时%.1f秒,打败了%d%%的用户!", timeUse, penset)
+        drag_tv_tips?.text = String.format("拼图成功: 耗时%.1f秒,打败了%d%%的用户!", timeUse, penset)
         tipsShowAnime(true)
         flashShowAnime()
-        sb!!.isEnabled = false
+        sb?.isEnabled = false
         setSbThumb(R.drawable.drag_btn_success)
-        sb!!.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_success)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_success)
     }
 
     fun fail() {
-        drag_tv_tips!!.text = "拼图失败: 请重新拖曳滑块到正确的位置!"
+        drag_tv_tips?.text = "拼图失败: 请重新拖曳滑块到正确的位置!"
         tipsShowAnime(true)
-        handler.postDelayed(resetRun, showTipsTime.toLong())
-        sb!!.isEnabled = false
+        handler?.postDelayed(resetRun, showTipsTime.toLong())
+        sb?.isEnabled = false
         setSbThumb(R.drawable.drag_btn_error)
-        sb!!.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_fail)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_fail)
     }
 
     fun reset() {
-        val position = sb!!.progress
+        val position = sb?.progress ?: 0
         if (position != 0) {
             val animator = ValueAnimator.ofFloat(1f, 0.0f)
             animator.setDuration(animeTime.toLong()).start()
             animator.addUpdateListener { animation ->
                 val f = animation.animatedValue as Float
-                sb!!.progress = (position * f).toInt()
+                sb?.progress = (position * f).toInt()
             }
         }
         tipsShowAnime(false)
         tips2ShowAnime(true)
-        sb!!.isEnabled = true
-        drag_v_flash!!.visibility = View.GONE
+        sb?.isEnabled = true
+        drag_v_flash?.visibility = View.GONE
         setSbThumb(R.drawable.drag_btn_n)
-        sb!!.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
-        drag_iv_block!!.visibility = View.VISIBLE
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
+        drag_iv_block?.visibility = View.VISIBLE
     }
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        val cw = drag_iv_cover!!.measuredWidth
-        val bw = drag_iv_block!!.measuredWidth
-        val l = drag_iv_block!!.layoutParams as ViewGroup.MarginLayoutParams
-        l.leftMargin = (cw - bw) * progress / seekBar.max
-        drag_iv_block!!.layoutParams = l
+        val cw = drag_iv_cover?.measuredWidth ?: 0
+        val bw = drag_iv_block?.measuredWidth ?: 0
+        val l = drag_iv_block?.layoutParams as? ViewGroup.MarginLayoutParams
+        l?.leftMargin = (cw - bw) * progress / seekBar.max
+        drag_iv_block?.layoutParams = l
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {
         setSbThumb(R.drawable.drag_btn)
-        sb!!.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
-        drag_iv_block!!.visibility = View.VISIBLE
-        drag_iv_cover!!.setImageBitmap(cover)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
+        drag_iv_block?.visibility = View.VISIBLE
+        drag_iv_cover?.setImageBitmap(cover)
         tips2ShowAnime(false)
         timeTemp = System.currentTimeMillis()
     }
@@ -192,10 +215,10 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     override fun onStopTrackingTouch(seekBar: SeekBar) {
         timeUse = (System.currentTimeMillis() - timeTemp) / 1000f
         if (dragListenner != null)
-            dragListenner!!.onDrag(
+            dragListenner?.onDrag(
                 px2dip(
                     context,
-                    (drag_iv_cover!!.measuredWidth - drag_iv_block!!.measuredWidth).toFloat() * 1f * seekBar.progress.toFloat() / seekBar.max
+                    (drag_iv_cover?.measuredWidth?.minus(drag_iv_block?.measuredWidth ?: 0) ?: 0).toFloat() * 1f * seekBar.progress.toFloat() / seekBar.max
                 ).toDouble()
             )
     }
@@ -213,19 +236,19 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
             val time = (showTipsTime * f).toInt()
 
             if (time < 125)
-                view!!.visibility = View.INVISIBLE
+                view?.visibility = View.INVISIBLE
             else if (time < 250)
-                view!!.visibility = View.VISIBLE
+                view?.visibility = View.VISIBLE
             else if (time < 375)
-                view!!.visibility = View.INVISIBLE
+                view?.visibility = View.INVISIBLE
             else
-                view!!.visibility = View.VISIBLE
+                view?.visibility = View.VISIBLE
         }
     }
 
     //提示文本显示隐藏
     private fun tipsShowAnime(isShow: Boolean) {
-        if (drag_tv_tips!!.visibility == View.VISIBLE == isShow)
+        if (drag_tv_tips?.visibility == View.VISIBLE == isShow)
             return
         val translateAnimation = TranslateAnimation(
             Animation.RELATIVE_TO_SELF, 0f,
@@ -234,27 +257,27 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
             Animation.RELATIVE_TO_SELF, if (isShow) 0f else 1f
         )
         translateAnimation.duration = animeTime.toLong()
-        drag_tv_tips!!.animation = translateAnimation
-        drag_tv_tips!!.visibility = if (isShow) View.VISIBLE else View.GONE
+        drag_tv_tips?.animation = translateAnimation
+        drag_tv_tips?.visibility = if (isShow) View.VISIBLE else View.GONE
     }
 
     //提示文本显示隐藏
     private fun tips2ShowAnime(isShow: Boolean) {
-        if (drag_tv_tips2!!.visibility == View.VISIBLE == isShow)
+        if (drag_tv_tips2?.visibility == View.VISIBLE == isShow)
             return
         val translateAnimation =
             AlphaAnimation((if (isShow) 0 else 1).toFloat(), (if (isShow) 1 else 0).toFloat())
         translateAnimation.duration = animeTime.toLong()
-        drag_tv_tips2!!.animation = translateAnimation
-        drag_tv_tips2!!.visibility = if (isShow) View.VISIBLE else View.GONE
+        drag_tv_tips2?.animation = translateAnimation
+        drag_tv_tips2?.visibility = if (isShow) View.VISIBLE else View.GONE
     }
 
     //成功完成拼图滑块消失
     private fun blockHideAnime() {
         val translateAnimation = AlphaAnimation(1f, 0f)
         translateAnimation.duration = animeTime.toLong()
-        drag_iv_block!!.animation = translateAnimation
-        drag_iv_block!!.visibility = View.GONE
+        drag_iv_block?.animation = translateAnimation
+        drag_iv_block?.visibility = View.GONE
     }
 
 
@@ -267,15 +290,15 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
             Animation.RELATIVE_TO_SELF, 0f
         )
         translateAnimation.duration = flashTime.toLong()
-        drag_v_flash!!.animation = translateAnimation
-        drag_v_flash!!.visibility = View.VISIBLE
+        drag_v_flash?.animation = translateAnimation
+        drag_v_flash?.visibility = View.VISIBLE
         translateAnimation.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {
 
             }
 
             override fun onAnimationEnd(animation: Animation) {
-                drag_v_flash!!.visibility = View.GONE
+                drag_v_flash?.visibility = View.GONE
             }
 
             override fun onAnimationRepeat(animation: Animation) {
@@ -287,14 +310,14 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     //设置seekBar的Thumb
     fun setSbThumb(id: Int) {
         val drawable = resources.getDrawable(id)
-        drawable.bounds = sb!!.thumb.bounds
-        sb!!.thumb = drawable
-        sb!!.thumbOffset = 0
+        drawable.bounds = sb?.thumb?.bounds ?: drawable.bounds
+        sb?.thumb = drawable
+        sb?.thumbOffset = 0
     }
 
     //设置seekBar是否可以滑动
     fun setSBUnMove(isMove: Boolean) {
-        sb!!.isEnabled = isMove
+        sb?.isEnabled = isMove
     }
 
 

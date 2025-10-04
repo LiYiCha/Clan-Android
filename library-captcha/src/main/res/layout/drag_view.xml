@@ -30,7 +30,7 @@
             android:background="@drawable/drag_flash" />
 
 
-        <com.example.verificationcodedemo.widget.DiyStyleTextView
+        <com.yc.captcha.widget.DiyStyleTextView
             android:id="@+id/drag_tv_tips"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

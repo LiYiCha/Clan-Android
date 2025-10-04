@@ -1,4 +1,4 @@
-package com.example.verificationcodedemo.widget
+package com.yc.captcha.widget
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -13,13 +13,14 @@ import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.core.view.setPadding
-import com.example.verificationcodedemo.R
-import com.example.verificationcodedemo.model.Point
-import com.example.verificationcodedemo.utils.DisplayUtil
-import com.example.verificationcodedemo.utils.DisplayUtil.px2dip
+import android.widget.ImageView
+import android.os.Handler
+import android.os.Looper
+import com.yc.captcha.R
+import com.yc.captcha.model.Point
+import com.yc.captcha.utils.DisplayUtil
+import com.yc.captcha.utils.DisplayUtil.px2dip
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.word_view.view.*
 
 /**
  * Date:2020/5/8
@@ -31,6 +32,12 @@ class WordImageView : FrameLayout {
     private var size: Int = 0//需要点击文字的数量
     private val mList: MutableList<Point> = mutableListOf()
     private var cover: Bitmap? = null
+    private var handler: Handler? = null
+    
+    // 视图组件
+    private var word_iv_cover: ImageView? = null
+    private var word_fl_content: FrameLayout? = null
+    private var word_v_flash: View? = null
 
     //监听
     private var wordListenner: WordListenner? = null
@@ -53,6 +60,12 @@ class WordImageView : FrameLayout {
 
     private fun init() {
         View.inflate(context, R.layout.word_view, this)
+        
+        // 初始化视图组件
+        word_iv_cover = findViewById(R.id.word_iv_cover)
+        word_fl_content = findViewById(R.id.word_fl_content)
+        word_v_flash = findViewById(R.id.word_v_flash)
+        handler = Handler(Looper.getMainLooper())
     }
 
     fun setSize(size: Int) {
@@ -67,11 +80,11 @@ class WordImageView : FrameLayout {
         this.cover = cover
         val w = cover.width
         val h = cover.height
-        val l = word_iv_cover!!.layoutParams
-        l.width = DisplayUtil.dip2px(context, w.toFloat())
-        l.height = DisplayUtil.dip2px(context, h.toFloat())
-        word_iv_cover!!.layoutParams = l
-        word_iv_cover!!.setImageBitmap(cover)
+        val l = word_iv_cover?.layoutParams
+        l?.width = DisplayUtil.dip2px(context, w.toFloat())
+        l?.height = DisplayUtil.dip2px(context, h.toFloat())
+        word_iv_cover?.layoutParams = l
+        word_iv_cover?.setImageBitmap(cover)
         setLocation(1f * cover.width / cover.height)
     }
 
@@ -81,33 +94,33 @@ class WordImageView : FrameLayout {
      */
     private fun setLocation(cover_wph: Float) {
         post {
-            val w = word_fl_content!!.measuredWidth
+            val w = word_fl_content?.measuredWidth ?: 0
             val h = (w / cover_wph).toInt()
-            val l = word_fl_content!!.layoutParams
-            l.width = w
-            l.height = h
-            word_fl_content!!.layoutParams = l
+            val l = word_fl_content?.layoutParams
+            l?.width = w
+            l?.height = h
+            word_fl_content?.layoutParams = l
         }
     }
 
     //验证成功
     fun ok() {
         flashShowAnime()
-        handler.postDelayed({ reset() }, 1000)
+        handler?.postDelayed({ reset() }, 1000)
     }
 
     //验证失败
     fun fail() {
-        handler.postDelayed({ reset() }, 1000)
+        handler?.postDelayed({ reset() }, 1000)
     }
 
     //控件状态重置
     fun reset() {
-        word_v_flash!!.visibility = View.GONE
+        word_v_flash?.visibility = View.GONE
         mList.clear()
-        word_fl_content!!.removeAllViews()
-        word_fl_content!!.addView(word_iv_cover)
-        word_fl_content!!.addView(word_v_flash)
+        word_fl_content?.removeAllViews()
+        word_iv_cover?.let { word_fl_content?.addView(it) }
+        word_v_flash?.let { word_fl_content?.addView(it) }
     }
 
     //成功高亮动画
@@ -119,15 +132,15 @@ class WordImageView : FrameLayout {
             Animation.RELATIVE_TO_SELF, 0f
         )
         translateAnimation.duration = flashTime.toLong()
-        word_v_flash!!.animation = translateAnimation
-        word_v_flash!!.visibility = View.VISIBLE
+        word_v_flash?.animation = translateAnimation
+        word_v_flash?.visibility = View.VISIBLE
         translateAnimation.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {
 
             }
 
             override fun onAnimationEnd(animation: Animation) {
-                word_v_flash!!.visibility = View.GONE
+                word_v_flash?.visibility = View.GONE
             }
 
             override fun onAnimationRepeat(animation: Animation) {
@@ -152,7 +165,7 @@ class WordImageView : FrameLayout {
             } else if (size == 0) {
                 addTextView(event)
                 if (wordListenner != null)
-                    wordListenner!!.onWordClick(Gson().toJson(mList))
+                    wordListenner?.onWordClick(Gson().toJson(mList))
                 Log.e("wuyan", "Gson().toJson(mList)" + Gson().toJson(mList))
             }
         }
@@ -171,10 +184,10 @@ class WordImageView : FrameLayout {
         textView.text = mList.size.toString()
         textView.setTextColor(Color.WHITE)
         textView.background = resources.getDrawable(R.drawable.shape_dot_bg)
-        val postion = textView.layoutParams as MarginLayoutParams
-        postion.leftMargin = event.x.toInt()-10
-        postion.topMargin = event.y.toInt()-10
-        word_fl_content!!.addView(textView)
+        val postion = textView.layoutParams as? ViewGroup.MarginLayoutParams
+        postion?.leftMargin = event.x.toInt()-10
+        postion?.topMargin = event.y.toInt()-10
+        word_fl_content?.addView(textView)
     }
 
     interface WordListenner {

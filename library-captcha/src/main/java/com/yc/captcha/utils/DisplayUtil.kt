@@ -1,4 +1,4 @@
-package com.example.verificationcodedemo.utils
+package com.yc.captcha.utils
 
 import android.content.Context
 

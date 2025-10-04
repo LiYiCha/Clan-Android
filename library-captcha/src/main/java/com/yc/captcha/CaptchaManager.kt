@@ -28,14 +28,9 @@ object CaptchaManager {
         onFailure: (String) -> Unit
     ) {
         BlockPuzzleDialog(context).apply {
-            setOnCaptchaResult(object : BlockPuzzleDialog.OnCaptchaResult {
-                override fun onSuccess(token: String) {
-                    onSuccess(token)
-                    dismiss()
-                }
-                
-                override fun onFailure(msg: String) {
-                    onFailure(msg)
+            setOnResultsListener(object : BlockPuzzleDialog.OnResultsListener {
+                override fun onResultsClick(result: String) {
+                    onSuccess(result)
                     dismiss()
                 }
             })
@@ -49,14 +44,9 @@ object CaptchaManager {
         onFailure: (String) -> Unit
     ) {
         WordCaptchaDialog(context).apply {
-            setOnCaptchaResult(object : WordCaptchaDialog.OnCaptchaResult {
-                override fun onSuccess(token: String) {
-                    onSuccess(token)
-                    dismiss()
-                }
-                
-                override fun onFailure(msg: String) {
-                    onFailure(msg)
+            setOnResultsListener(object : WordCaptchaDialog.OnResultsListener {
+                override fun onResultsClick(result: String) {
+                    onSuccess(result)
                     dismiss()
                 }
             })

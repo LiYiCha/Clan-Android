@@ -1,4 +1,4 @@
-package com.example.verificationcodedemo.widget
+package com.yc.captcha.widget
 
 import android.content.Context
 import android.text.Spannable

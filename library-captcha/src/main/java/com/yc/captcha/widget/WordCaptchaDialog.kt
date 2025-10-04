@@ -1,4 +1,4 @@
-package com.example.verificationcodedemo.widget
+package com.yc.captcha.widget
 
 import android.app.Activity
 import android.app.Dialog
@@ -14,14 +14,14 @@ import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.example.verificationcodedemo.R
-import com.example.verificationcodedemo.model.CaptchaCheckOt
-import com.example.verificationcodedemo.model.CaptchaGetOt
-import com.example.verificationcodedemo.network.Configuration
-import com.example.verificationcodedemo.network.Configuration.token
-import com.example.verificationcodedemo.utils.AESUtil
-import com.example.verificationcodedemo.utils.ImageUtil
-import kotlinx.android.synthetic.main.dialog_word_captcha.*
+import com.yc.captcha.R
+import com.yc.captcha.databinding.DialogWordCaptchaBinding
+import com.yc.captcha.model.CaptchaCheckOt
+import com.yc.captcha.model.CaptchaGetOt
+import com.yc.captcha.network.Configuration
+import com.yc.captcha.network.Configuration.token
+import com.yc.captcha.utils.AESUtil
+import com.yc.captcha.utils.ImageUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -31,18 +31,21 @@ import kotlinx.coroutines.launch
  * author:wuyan
  */
 class WordCaptchaDialog : Dialog {
+    
+    private lateinit var binding: DialogWordCaptchaBinding
+
     constructor(mContext: Context) : this(mContext, 0)
     constructor(mContext: Context, themeResId: Int) : super(
         mContext,
-        com.example.verificationcodedemo.R.style.dialog
+        R.style.dialog
     ) {
-        window!!.setGravity(Gravity.CENTER)
-        window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        window?.setGravity(Gravity.CENTER)
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         val windowManager = (mContext as Activity).windowManager
         val display = windowManager.defaultDisplay
-        val lp = window!!.attributes
-        lp.width = display.width * 9 / 10//设置宽度为屏幕的0.9
-        window!!.attributes = lp
+        val lp = window?.attributes
+        lp?.width = display.width * 9 / 10//设置宽度为屏幕的0.9
+        window?.attributes = lp
         setCanceledOnTouchOutside(false)//点击外部Dialog不消失
 
     }
@@ -54,20 +57,23 @@ class WordCaptchaDialog : Dialog {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.example.verificationcodedemo.R.layout.dialog_word_captcha)
+        
+        // 使用ViewBinding初始化
+        binding = DialogWordCaptchaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        tv_delete.setOnClickListener {
+        binding.tvDelete.setOnClickListener {
             dismiss()
         }
 
-        tv_refresh.setOnClickListener {
-            wordView.reset()
+        binding.tvRefresh.setOnClickListener {
+            binding.wordView.reset()
             loadCaptcha()
         }
 
         //设置默认图片
         val bitmap: Bitmap = ImageUtil.getBitmap(context, R.drawable.bg_default)
-        wordView.setUp(
+        binding.wordView.setUp(
             ImageUtil.base64ToBitmap(ImageUtil.bitmapToBase64(bitmap))!!
         )
         loadCaptcha()
@@ -77,10 +83,10 @@ class WordCaptchaDialog : Dialog {
         Configuration.token = ""
         GlobalScope.launch(Dispatchers.Main) {
             try {
-                bottomTitle.text = "数据加载中......"
-                bottomTitle.setTextColor(Color.BLACK)
-                wordView.visibility = View.INVISIBLE
-                rl_pb_word.visibility = View.VISIBLE
+                binding.bottomTitle.text = "数据加载中......"
+                binding.bottomTitle.setTextColor(Color.BLACK)
+                binding.wordView.visibility = View.INVISIBLE
+                binding.rlPbWord.visibility = View.VISIBLE
 
                 val o = CaptchaGetOt(
                     captchaType = "clickWord"
@@ -89,44 +95,44 @@ class WordCaptchaDialog : Dialog {
                 when (b?.repCode) {
 
                     "0000" -> {
-                        baseImageBase64 = b.repData!!.originalImageBase64
-                        Configuration.token = b.repData!!.token
-                        key= b.repData!!.secretKey
+                        baseImageBase64 = b.repData?.originalImageBase64 ?: ""
+                        Configuration.token = b.repData?.token ?: ""
+                        key = b.repData?.secretKey ?: ""
                         var wordStr: String = ""
-                        var i = 0;
-                        b.repData!!.wordList!!.forEach {
+                        var i = 0
+                        b.repData?.wordList?.forEach {
                             i++
                             wordStr += it
-                            if (i < b.repData!!.wordList!!.size)
+                            if (i < b.repData?.wordList?.size ?: 0)
                                 wordStr += ","
                         }
-                        wordView.setSize(b.repData!!.wordList!!.size)
-                        bottomTitle.text = "请依此点击【" + wordStr + "】"
-                        bottomTitle.setTextColor(Color.BLACK)
-                        wordView.setUp(
+                        binding.wordView.setSize(b.repData?.wordList?.size ?: 0)
+                        binding.bottomTitle.text = "请依此点击【" + wordStr + "】"
+                        binding.bottomTitle.setTextColor(Color.BLACK)
+                        binding.wordView.setUp(
                             ImageUtil.base64ToBitmap(baseImageBase64)!!
                         )
                         initEvent()
                     }
                     else -> {
-                        bottomTitle.text = "加载失败,请刷新"
-                        bottomTitle.setTextColor(Color.RED)
-                        wordView.setSize(-1)
+                        binding.bottomTitle.text = "加载失败,请刷新"
+                        binding.bottomTitle.setTextColor(Color.RED)
+                        binding.wordView.setSize(-1)
                     }
                 }
-                wordView.visibility = VISIBLE
-                rl_pb_word.visibility = GONE
+                binding.wordView.visibility = VISIBLE
+                binding.rlPbWord.visibility = GONE
 
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.e("wuyan", e.toString())
                 runUIDelayed(
                     Runnable {
-                        bottomTitle.text = "加载失败,请刷新"
-                        bottomTitle.setTextColor(Color.RED)
-                        wordView.setSize(-1)
-                        wordView.visibility = VISIBLE
-                        rl_pb_word.visibility = GONE
+                        binding.bottomTitle.text = "加载失败,请刷新"
+                        binding.bottomTitle.setTextColor(Color.RED)
+                        binding.wordView.setSize(-1)
+                        binding.wordView.visibility = VISIBLE
+                        binding.rlPbWord.visibility = GONE
                     }, 1000
                 )
             }
@@ -147,9 +153,9 @@ class WordCaptchaDialog : Dialog {
                 when (b?.repCode) {
 
                     "0000" -> {
-                        bottomTitle.text = "验证成功"
-                        bottomTitle.setTextColor(Color.GREEN)
-                        wordView.ok()
+                        binding.bottomTitle.text = "验证成功"
+                        binding.bottomTitle.setTextColor(Color.GREEN)
+                        binding.wordView.ok()
                         runUIDelayed(
                             Runnable {
                                 dismiss()
@@ -158,13 +164,13 @@ class WordCaptchaDialog : Dialog {
                         )
 
                         val result = token + "---" + pointListStr
-                        mOnResultsListener!!.onResultsClick(AESUtil.encode(result, key))
+                        mOnResultsListener?.onResultsClick(AESUtil.encode(result, key))
 
                     }
                     else -> {
-                        bottomTitle.text = "验证失败"
-                        bottomTitle.setTextColor(Color.RED)
-                        wordView.fail()
+                        binding.bottomTitle.text = "验证失败"
+                        binding.bottomTitle.setTextColor(Color.RED)
+                        binding.wordView.fail()
                         runUIDelayed(
                             Runnable {
                                 //刷新验证码
@@ -176,9 +182,9 @@ class WordCaptchaDialog : Dialog {
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                bottomTitle.text = "验证失败"
-                bottomTitle.setTextColor(Color.RED)
-                wordView.fail()
+                binding.bottomTitle.text = "验证失败"
+                binding.bottomTitle.setTextColor(Color.RED)
+                binding.wordView.fail()
                 runUIDelayed(
                     Runnable {
                         //刷新验证码
@@ -190,10 +196,10 @@ class WordCaptchaDialog : Dialog {
     }
 
     fun initEvent() {
-        wordView.setWordListenner(object : WordImageView.WordListenner {
+        binding.wordView.setWordListenner(object : WordImageView.WordListenner {
             override fun onWordClick(cryptedStr: String) {
                 if (cryptedStr != null) {
-                    checkCaptcha(cryptedStr!!)
+                    checkCaptcha(cryptedStr)
                 }
             }
         })
@@ -202,7 +208,7 @@ class WordCaptchaDialog : Dialog {
     fun runUIDelayed(run: Runnable, de: Int) {
         if (handler == null)
             handler = Handler(Looper.getMainLooper())
-        handler!!.postDelayed(run, de.toLong())
+        handler?.postDelayed(run, de.toLong())
     }
 
     var mOnResultsListener: OnResultsListener? = null
@@ -214,6 +220,4 @@ class WordCaptchaDialog : Dialog {
     fun setOnResultsListener(mOnResultsListener: OnResultsListener) {
         this.mOnResultsListener = mOnResultsListener
     }
-
-
 }

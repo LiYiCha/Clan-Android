@@ -1,6 +1,6 @@
-package com.example.verificationcodedemo.network
+package com.yc.captcha.network
 
-import com.example.verificationcodedemo.model.*
+import com.yc.captcha.model.*
 import kotlinx.coroutines.Deferred
 import retrofit2.Response
 import retrofit2.http.Body

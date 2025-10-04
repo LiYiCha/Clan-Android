@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp">
 
-        <com.example.verificationcodedemo.widget.WordImageView
+        <com.yc.captcha.widget.WordImageView
             android:id="@+id/wordView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
