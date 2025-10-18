@@ -6,11 +6,14 @@
 
 这是一个现代化的宗门管理系统，采用Android MVVM架构模式开发，提供宗门成员管理、角色故事经历、活动组织、任务处理等功能。
 
+## 项目地址
+[GITEE](https://gitee.com/ycWyx/clan-android)
+[GITHUB](https://github.com/LiYiCha/Clan-Android)
 ## 技术架构
 
 - **架构模式**: MVVM (Model-View-ViewModel)
 - **开发语言**: Kotlin
-- **UI框架**: Android原生 + Material Design
+- **UI框架**: Android原生 + Material Design + Compose
 - **依赖注入**: Hilt/Dagger
 - **网络请求**: Retrofit + OkHttp
 - **数据存储**: Room数据库
