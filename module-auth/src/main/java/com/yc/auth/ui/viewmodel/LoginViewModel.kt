@@ -27,7 +27,7 @@ class LoginViewModel : BaseViewModel() {
     private val repository by lazy { LoginRepository() }
 
     /**
-     * 执行登录
+     * 执行登录（旧方法，使用固定验证码）
      */
     fun login() {
         val usernameValue = username.value ?: ""
@@ -46,6 +46,24 @@ class LoginViewModel : BaseViewModel() {
             resultState = loginResult,
             isShowDialog = true,
             loadingMessage = "登录中... "
+        )
+    }
+    
+    /**
+     * 使用验证码登录
+     * 
+     * @param username 用户名
+     * @param password 密码
+     * @param captchaCode 验证码（从 CaptchaManager 获取）
+     */
+    fun loginWithCaptcha(username: String, password: String, captchaCode: String) {
+        requestNoCheck(
+            block = {
+                repository.loginWithCaptcha(username, password, captchaCode)
+            },
+            resultState = loginResult,
+            isShowDialog = true,
+            loadingMessage = "登录中..."
         )
     }
 }

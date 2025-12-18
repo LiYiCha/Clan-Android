@@ -13,7 +13,8 @@ import android.util.Log
 import android.view.View.*
 import android.widget.Toast
 import com.yc.captcha.R
-import com.yc.captcha.databinding.DialogBlockPuzzleBinding
+import android.widget.ImageView
+import android.widget.ProgressBar
 import com.yc.captcha.model.CaptchaCheckOt
 import com.yc.captcha.model.CaptchaGetOt
 import com.yc.captcha.model.Point
@@ -21,17 +22,24 @@ import com.yc.captcha.network.Configuration
 import com.yc.captcha.utils.AESUtil
 import com.yc.captcha.utils.ImageUtil
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
- * Date:2020/5/6
- * author:wuyan
+ * 滑块拼图验证码对话框
  */
 class BlockPuzzleDialog : Dialog {
 
-    private lateinit var binding: DialogBlockPuzzleBinding
+    private var dragView: DragImageView? = null
+    private var tvDelete: ImageView? = null
+    private var tvRefresh: ImageView? = null
+    private var rlPb: ProgressBar? = null
+    
+    // 使用独立的协程作用域，避免使用 GlobalScope
+    private val dialogScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     constructor(mContext: Context) : this(mContext, 0)
     constructor(mContext: Context, themeResId: Int) : super(
@@ -43,150 +51,159 @@ class BlockPuzzleDialog : Dialog {
         val windowManager = (mContext as Activity).windowManager
         val display = windowManager.defaultDisplay
         val lp = window?.attributes
-        lp?.width = display.width * 9 / 10//设置宽度为屏幕的0.9
+        lp?.width = display.width * 9 / 10
         window?.attributes = lp
-        setCanceledOnTouchOutside(false)//点击外部Dialog不消失
+        setCanceledOnTouchOutside(false)
     }
 
-    var baseImageBase64: String = ""//背景图片
-    var slideImageBase64: String = ""//滑动图片
-    var key: String = ""//ase加密密钥
-    var handler: Handler? = null
+    private var baseImageBase64: String = ""
+    private var slideImageBase64: String = ""
+    private var key: String = ""
+    private var handler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 使用ViewBinding初始化
-        binding = DialogBlockPuzzleBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.dialog_block_puzzle)
 
-        // 使用binding访问视图
-        binding.tvDelete.setOnClickListener {
+        dragView = findViewById(R.id.dragView)
+        tvDelete = findViewById(R.id.tv_delete)
+        tvRefresh = findViewById(R.id.tv_refresh)
+        rlPb = findViewById(R.id.rl_pb)
+
+        tvDelete?.setOnClickListener {
             dismiss()
         }
 
-        binding.tvRefresh.setOnClickListener {
+        tvRefresh?.setOnClickListener {
             loadCaptcha()
         }
 
-        //设置默认图片
         val bitmap: Bitmap = ImageUtil.getBitmap(context, R.drawable.bg_default)
-        binding.dragView.setUp(bitmap, bitmap)
-        binding.dragView.setSBUnMove(false)
+        dragView?.setUp(bitmap, bitmap)
+        dragView?.setSBUnMove(false)
         loadCaptcha()
     }
 
     private fun loadCaptcha() {
         Configuration.token = ""
-        GlobalScope.launch(Dispatchers.Main) {
+        dialogScope.launch {
             try {
+                dragView?.visibility = INVISIBLE
+                rlPb?.visibility = VISIBLE
 
-                binding.dragView.visibility = INVISIBLE
-                binding.rlPb.visibility = VISIBLE
-
-                val o = CaptchaGetOt(
-                    captchaType = "blockPuzzle"
-                )
-                val b = Configuration.server.getAsync(o).await().body()
-                when (b?.repCode) {
-
+                val request = CaptchaGetOt(captchaType = "blockPuzzle")
+                val response = Configuration.server.getCaptcha(request)
+                val body = response.body()
+                
+                when (body?.repCode) {
                     "0000" -> {
-                        baseImageBase64 = b.repData?.originalImageBase64 ?: ""
-                        slideImageBase64 = b.repData?.jigsawImageBase64 ?: ""
-                        Configuration.token = b.repData?.token ?: ""
-                        key = b.repData?.secretKey ?: ""
+                        baseImageBase64 = body.repData?.originalImageBase64 ?: ""
+                        slideImageBase64 = body.repData?.jigsawImageBase64 ?: ""
+                        Configuration.token = body.repData?.token ?: ""
+                        key = body.repData?.secretKey ?: ""
 
-                        binding.dragView.setUp(
-                            ImageUtil.base64ToBitmap(baseImageBase64)!!,
-                            ImageUtil.base64ToBitmap(slideImageBase64)!!
-                        )
-                        binding.dragView.setSBUnMove(true)
-                        initEvent()
+                        val baseBitmap = ImageUtil.base64ToBitmap(baseImageBase64)
+                        val slideBitmap = ImageUtil.base64ToBitmap(slideImageBase64)
+                        
+                        if (baseBitmap != null && slideBitmap != null) {
+                            dragView?.setUp(baseBitmap, slideBitmap)
+                            dragView?.setSBUnMove(true)
+                            initEvent()
+                        } else {
+                            dragView?.setSBUnMove(false)
+                            Toast.makeText(context, "图片解码失败", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     else -> {
-                        binding.dragView.setSBUnMove(false)
+                        dragView?.setSBUnMove(false)
+                        val msg = body?.repData?.toString() ?: "未知错误"
+                        Toast.makeText(context, "验证码获取失败: $msg", Toast.LENGTH_SHORT).show()
                     }
                 }
-                binding.dragView.visibility = VISIBLE
-                binding.rlPb.visibility = GONE
+                dragView?.visibility = VISIBLE
+                rlPb?.visibility = GONE
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                runUIDelayed(
-                    Runnable {
-                        binding.dragView.setSBUnMove(false)
-                        binding.dragView.visibility = VISIBLE
-                        binding.rlPb.visibility = GONE
-                        Toast.makeText(context, "网络请求错误", Toast.LENGTH_SHORT).show()
-                    }, 1000
-                )
+                Log.e("BlockPuzzleDialog", "加载验证码失败", e)
+                runUIDelayed({
+                    dragView?.setSBUnMove(false)
+                    dragView?.visibility = VISIBLE
+                    rlPb?.visibility = GONE
+                    Toast.makeText(context, "网络请求错误: ${e.message}", Toast.LENGTH_SHORT).show()
+                }, 500)
             }
         }
     }
 
     private fun checkCaptcha(sliderXMoved: Double) {
         val point = Point(sliderXMoved, 5.0)
-        val pointStr = Gson().toJson(point).toString()
-        Log.e("wuyan", pointStr)
-        Log.e("wuyan", AESUtil.encode(pointStr, key))
-        GlobalScope.launch(Dispatchers.Main) {
+        val pointStr = Gson().toJson(point)
+        Log.d("BlockPuzzleDialog", "pointStr: $pointStr")
+        
+        dialogScope.launch {
             try {
-                val o = CaptchaCheckOt(
+                val request = CaptchaCheckOt(
                     captchaType = "blockPuzzle",
                     pointJson = AESUtil.encode(pointStr, key),
                     token = Configuration.token
                 )
-                val b = Configuration.server.checkAsync(o).await().body()
-                when (b?.repCode) {
-
+                val response = Configuration.server.checkCaptcha(request)
+                val body = response.body()
+                
+                when (body?.repCode) {
                     "0000" -> {
-                        binding.dragView.ok()
-                        runUIDelayed(
-                            Runnable {
-                                binding.dragView.reset()
-                                dismiss()
-                                loadCaptcha()
-                            }, 2000
-                        )
+                        dragView?.ok()
+                        runUIDelayed({
+                            dragView?.reset()
+                            dismiss()
+                        }, 1500)
                         val result = Configuration.token + "---" + pointStr
                         mOnResultsListener?.onResultsClick(AESUtil.encode(result, key))
                     }
                     else -> {
-                        binding.dragView.fail()
-                        //刷新验证码
+                        dragView?.fail()
                         loadCaptcha()
                     }
                 }
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                binding.dragView.fail()
+                Log.e("BlockPuzzleDialog", "验证失败", e)
+                dragView?.fail()
                 loadCaptcha()
             }
         }
     }
 
-    fun initEvent() {
-        binding.dragView.setDragListenner(object : DragImageView.DragListenner {
+    private fun initEvent() {
+        dragView?.setDragListenner(object : DragImageView.DragListenner {
             override fun onDrag(position: Double) {
                 checkCaptcha(position)
             }
         })
     }
 
-    fun runUIDelayed(run: Runnable, de: Int) {
-        if (handler == null)
+    private fun runUIDelayed(run: Runnable, delayMs: Int) {
+        if (handler == null) {
             handler = Handler(Looper.getMainLooper())
-        handler?.postDelayed(run, de.toLong())
+        }
+        handler?.postDelayed(run, delayMs.toLong())
+    }
+    
+    override fun dismiss() {
+        super.dismiss()
+        // 取消所有协程
+        dialogScope.cancel()
+        handler?.removeCallbacksAndMessages(null)
     }
 
-    var mOnResultsListener: OnResultsListener? = null
+    private var mOnResultsListener: OnResultsListener? = null
 
     interface OnResultsListener {
         fun onResultsClick(result: String)
     }
 
-    fun setOnResultsListener(mOnResultsListener: OnResultsListener) {
-        this.mOnResultsListener = mOnResultsListener
+    fun setOnResultsListener(listener: OnResultsListener) {
+        this.mOnResultsListener = listener
     }
 }

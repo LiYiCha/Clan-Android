@@ -4,7 +4,6 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
@@ -37,11 +36,11 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
     private var block: Bitmap? = null
 
     // 视图组件
-    private var drag_tv_tips: DiyStyleTextView? = null
+    private var drag_tv_tips: TextView? = null
     private var drag_tv_tips2: TextView? = null
     private var drag_iv_cover: ImageView? = null
     private var drag_iv_block: ImageView? = null
-    private var drag_fl_content: RelativeLayout? = null
+    private var drag_fl_content: FrameLayout? = null
     private var drag_v_flash: View? = null
     private var handler: Handler? = null
 
@@ -62,7 +61,7 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
             val f = animation.animatedValue as Float
             sb?.progress = (position * f).toInt()
             setSbThumb(R.drawable.drag_btn_n)
-            sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
+            sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress, null)
         }
     }
 
@@ -98,8 +97,6 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         sb = findViewById(R.id.drag_sb)
         handler = Handler(Looper.getMainLooper())
 
-        //设置需要字体颜色为红色的内容
-        drag_tv_tips?.setColorRegex("拼图|成功|失败|正确|[\\d\\.%]+", -0x8aeaf)
         sb?.max = context.resources.displayMetrics.widthPixels
         sb?.setOnSeekBarChangeListener(this)
         reset()
@@ -164,7 +161,7 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         flashShowAnime()
         sb?.isEnabled = false
         setSbThumb(R.drawable.drag_btn_success)
-        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_success)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_success, null)
     }
 
     fun fail() {
@@ -173,7 +170,7 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         handler?.postDelayed(resetRun, showTipsTime.toLong())
         sb?.isEnabled = false
         setSbThumb(R.drawable.drag_btn_error)
-        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_fail)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress_fail, null)
     }
 
     fun reset() {
@@ -191,7 +188,7 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
         sb?.isEnabled = true
         drag_v_flash?.visibility = View.GONE
         setSbThumb(R.drawable.drag_btn_n)
-        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress, null)
         drag_iv_block?.visibility = View.VISIBLE
     }
 
@@ -205,7 +202,7 @@ class DragImageView : FrameLayout, SeekBar.OnSeekBarChangeListener {
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {
         setSbThumb(R.drawable.drag_btn)
-        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress)
+        sb?.progressDrawable = context.resources.getDrawable(R.drawable.drag_seek_progress, null)
         drag_iv_block?.visibility = View.VISIBLE
         drag_iv_cover?.setImageBitmap(cover)
         tips2ShowAnime(false)

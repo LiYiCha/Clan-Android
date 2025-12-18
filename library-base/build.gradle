@@ -39,17 +39,19 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget =JavaVersion.VERSION_17
+        jvmTarget = "11"
     }
 }
 
 dependencies {
     api fileTree(include: ['*.?ar'], dir: 'libs')
     api project(':library-mvvmlazy')
+    // 验证码模块
+    api project(':library-captcha')
 
     //阿里路由框架
     api rootProject.ext.dependencies["arouter-api"]
@@ -92,4 +94,9 @@ dependencies {
     api rootProject.ext.dependencies["customactivityoncrash"]
 
     api rootProject.ext.dependencies["liveEventBus"]
+    
+    // Room 数据库
+    api rootProject.ext.android_x["room"]
+    api rootProject.ext.android_x["room-ktx"]
+    kapt rootProject.ext.android_x["room-compiler"]
 }

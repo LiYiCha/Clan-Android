@@ -10,17 +10,17 @@ import java.io.Serializable
  * *******************************
  */
 class UserInfoEntity(
-    var access_token: String,
+    var accessToken: String,
     var token_type: String,
-    var refresh_token: String,
+    var refreshToken: String,
     var expires_in: Long,
     var scope: String
 ) : Serializable {
     override fun toString(): String {
         return "UserInfoEntity{" +
-                "access_token='" + access_token + '\'' +
+                "accessToken='" + accessToken + '\'' +
                 ", token_type='" + token_type + '\'' +
-                ", refresh_token='" + refresh_token + '\'' +
+                ", refreshToken='" + refreshToken + '\'' +
                 ", expires_in='" + expires_in + '\'' +
                 ", scope='" + scope +
                 '}'

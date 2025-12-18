@@ -2,6 +2,7 @@
 # Android & Kotlin
 agp = "8.11.1"
 kotlin = "2.0.21"
+#kotlin = "1.9.24"
 coreKtx = "1.12.0"
 appcompat = "1.6.1"
 activity = "1.8.2"
@@ -143,4 +144,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+
+# Compose Compiler plugin（Kotlin Compose 编译器插件）
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 

@@ -133,13 +133,13 @@ class UserInfoUtils() {
      * 判断用户是否登录，用户未登录，直接跳转到登录界面
      */
     val isLogin: Boolean
-        get() = !(null == userInfo || TextUtils.isEmpty(userInfo!!.access_token))
+        get() = !(null == userInfo || TextUtils.isEmpty(userInfo!!.accessToken))
 
     /**
      * 判断用户是否登录，不跳转
      */
     val isLogin2: Boolean
-        get() = !(null == userInfo || TextUtils.isEmpty(userInfo!!.access_token))
+        get() = !(null == userInfo || TextUtils.isEmpty(userInfo!!.accessToken))
 
     /**
      * 退出登录

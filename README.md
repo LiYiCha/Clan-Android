@@ -1,10 +1,10 @@
 # Clan Management System
 
-一个基于Android MVVM架构的宗门管理系统应用。
+一个基于Android MVVM架构的团队管理系统应用。
 
 ## 项目概述
 
-这是一个现代化的宗门管理系统，采用Android MVVM架构模式开发，提供宗门成员管理、角色故事经历、活动组织、任务处理等功能。
+这是一个现代化的团队管理系统，采用Android MVVM架构模式开发，提供团队成员管理、角色故事经历、活动组织、任务处理等功能。
 
 ## 项目地址
 [GITEE](https://gitee.com/ycWyx/clan-android)
@@ -45,6 +45,8 @@ clan-mvvm/
 - **界面截图**: 
   
   ![登录界面](image/login.png)
+  ![主页](image/home.png)
+  ![任务列表](image/task_list.png)
   
 - **技术特点**:
   - Material Design风格界面
@@ -52,31 +54,57 @@ clan-mvvm/
   - 响应式UI设计
   - 独立模块化管理
 
-### 🚧 待开发模块
+### 🚧 主要模块
 
-#### 2. 主页模块 (Home)
+#### 2. 用户信息模块 (module-user)
 - **功能规划**:
-  - 宗门概览仪表板
-  - 快速导航菜单
-  - 最新动态展示
-  - 个人信息卡片
+  - 个人资料查看/编辑
+  - 密码修改
+  - 头像上传
+- **API文档**: [MODULE_USER_API.md](docs/MODULE_USER_API.md)
 
-#### 3. 成员管理模块
+#### 3. 团队管理模块 (module-sect)
 - **功能规划**:
-  - 成员信息录入
-  - 成员树展示
-  - 成员搜索筛选
-  - 关系图谱
+  - 团队列表展示
+  - 团队切换
+  - 团队统计数据
+  - 首页仪表盘
+- **API文档**: [MODULE_SECT_API.md](docs/MODULE_SECT_API.md)
 
-#### 4. 活动管理模块
+#### 4. 任务管理模块 (module-task)
 - **功能规划**:
-  - 活动发布
-  - 报名管理
-  - 活动提醒
-  - 历史活动回顾
-  
-#### 5. 其他模块
-- ???
+  - 我的任务列表
+  - 任务详情查看
+  - 任务状态管理
+  - 任务创建/编辑
+- **API文档**: [MODULE_TASK_API.md](docs/MODULE_TASK_API.md)
+
+#### 5. 文档管理模块 (module-document)
+- **功能规划**:
+  - 最近访问文档
+  - 文档浏览器
+  - Markdown/富文本渲染
+- **API文档**: [MODULE_DOCUMENT_API.md](docs/MODULE_DOCUMENT_API.md)
+
+#### 6. 消息通知模块 (module-message)
+- **功能规划**:
+  - 消息列表
+  - 未读统计
+  - 推送通知
+- **API文档**: [MODULE_MESSAGE_API.md](docs/MODULE_MESSAGE_API.md)
+
+## 📚 开发文档
+
+| 文档 | 说明 |
+|------|------|
+| [API_DESIGN.md](docs/API_DESIGN.md) | API 总体设计规范 |
+| [DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) | 开发计划与进度 |
+| [MODULE_AUTH_API.md](docs/MODULE_AUTH_API.md) | 认证模块 API 详细文档 |
+| [MODULE_USER_API.md](docs/MODULE_USER_API.md) | 用户模块 API 详细文档 |
+| [MODULE_SECT_API.md](docs/MODULE_SECT_API.md) | 团队模块 API 详细文档 |
+| [MODULE_TASK_API.md](docs/MODULE_TASK_API.md) | 任务模块 API 详细文档 |
+| [MODULE_DOCUMENT_API.md](docs/MODULE_DOCUMENT_API.md) | 文档模块 API 详细文档 |
+| [MODULE_MESSAGE_API.md](docs/MODULE_MESSAGE_API.md) | 消息模块 API 详细文档 |
 
 ## 开发环境
 

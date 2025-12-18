@@ -1,14 +1,18 @@
 package com.yc.auth.ui.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.rui.base.cache.UserCache
+import com.rui.base.network.TokenManager
 import com.rui.mvvmlazy.state.ResultState
 import com.yc.auth.databinding.ActivityLoginBinding
 import com.yc.auth.ui.viewmodel.LoginViewModel
+import com.yc.captcha.CaptchaManager
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -51,8 +55,44 @@ class LoginActivity : AppCompatActivity() {
             }
         })
 
-        // 设置登录按钮点击事件
-        binding.btnLogin.setOnClickListener { viewModel.login() }
+        // 设置登录按钮点击事件 - 先验证码再登录
+        binding.btnLogin.setOnClickListener { 
+            showCaptchaAndLogin()
+        }
+        // 测试入口：跳过登录直接进入首页
+        binding.tvSkipLogin.setOnClickListener {
+            navigateToHome()
+        }
+    }
+    
+    /**
+     * 显示验证码并登录
+     */
+    private fun showCaptchaAndLogin() {
+        val username = viewModel.username.value ?: ""
+        val password = viewModel.password.value ?: ""
+        
+        // 先检查用户名密码
+        if (username.isEmpty() || password.isEmpty()) {
+            viewModel.errorMessage.value = "请填写完整信息"
+            return
+        }
+        
+        // 显示滑块验证码
+        CaptchaManager.showBlockPuzzleCaptcha(
+            context = this,
+            onSuccess = { captchaCode ->
+                // 验证成功，执行登录
+                viewModel.loginWithCaptcha(username, password, captchaCode)
+            },
+            onFailure = { error ->
+                // 验证失败
+                viewModel.errorMessage.value = "验证失败: $error"
+            },
+            onCancel = {
+                // 用户取消验证
+            }
+        )
     }
 
     private fun observeViewModel() {
@@ -74,9 +114,26 @@ class LoginActivity : AppCompatActivity() {
                     binding.btnLogin.isEnabled = true
                     val loginData = result.data
                     if (loginData.success) {
-
-                        Toast.makeText(this, "登录成功 ", Toast.LENGTH_SHORT).show()
-                        // 跳转到主页面
+                        // 保存 Token
+                        loginData.data?.let { data ->
+                            TokenManager.saveToken(
+                                accessToken = data.accessToken,
+                                refreshToken = data.refreshToken,
+                            )
+//                            // 保存用户信息到缓存
+//                            UserCache.saveUserInfo(
+//                                UserCache.CachedUserInfo(
+//                                    charId = data.charId,
+//                                    username = data.username,
+//                                    nickname = data.nickname,
+//                                    avatar = data.avatar
+//                                )
+//                            )
+                        }
+                        
+                        Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show()
+                        // 跳转到首页
+                        navigateToHome()
                     } else {
                         // 登录失败，显示错误信息
                         binding.tvError.text = loginData.message
@@ -90,6 +147,20 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-
-
+    
+    /**
+     * 跳转到首页
+     */
+    private fun navigateToHome() {
+        try {
+            val clazz = Class.forName("com.yc.home.ui.HomeActivity")
+            val intent = Intent(this, clazz)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
+            Toast.makeText(this, "无法跳转到首页", Toast.LENGTH_SHORT).show()
+        }
+    }
 }

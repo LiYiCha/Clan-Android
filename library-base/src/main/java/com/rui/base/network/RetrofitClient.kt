@@ -82,6 +82,7 @@ class RetrofitClient(
         okHttpClient = OkHttpClient.Builder()
             .cookieJar(CookieJarImpl(PersistentCookieStore(appContext)))
             .cache(cache)
+            .addInterceptor(AuthInterceptor()) // 认证拦截器（自动添加Token）
             .addInterceptor(BaseInterceptor(headers))
             .addInterceptor(CacheInterceptor(appContext))
             .sslSocketFactory(sslParams.sSLSocketFactory, sslParams.trustManager)

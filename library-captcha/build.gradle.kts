@@ -51,24 +51,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // ===== 网络相关 =====
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")  
     implementation("com.google.code.gson:gson:2.10.1")
-
-    // ===== 注解处理 =====
-    kapt("com.squareup.moshi:moshi-kotlin-codegen:1.15.0")
 
     // ===== 测试依赖=====
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
-    /* ===== 可选：如果项目已包含这些依赖，可以注释掉 =====
-    // 如果你项目中已经通过base模块或其他方式引入了这些依赖，
-    // 为了避免重复，可以注释掉上面的对应依赖
-    // 但建议保持独立，这样模块可以直接复制到其他项目使用
-    ===== */
 }
