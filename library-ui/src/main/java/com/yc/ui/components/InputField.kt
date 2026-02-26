@@ -90,7 +90,7 @@ fun InputField(
                 onNext = { onImeAction() },
                 onGo = { onImeAction() }
             ),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         )
         
@@ -167,7 +167,7 @@ fun PasswordField(
                 onDone = { onImeAction() },
                 onGo = { onImeAction() }
             ),
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         )
         

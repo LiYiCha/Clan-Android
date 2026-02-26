@@ -3,12 +3,12 @@ package com.yc.ui.theme
 import androidx.compose.ui.graphics.Color
 
 /**
- * 应用主色调 - 浅绿渐变蓝
+ * 应用主色调 - Premium Indigo Palette
  */
-val Primary = Color(0xFF4CAF50)           // 主色 - 绿色
-val PrimaryVariant = Color(0xFF388E3C)    // 主色变体
-val Secondary = Color(0xFF2196F3)         // 次要色 - 蓝色
-val SecondaryVariant = Color(0xFF1976D2)  // 次要色变体
+val Primary = Color(0xFF4361EE)           // 主色 - Indigo
+val PrimaryVariant = Color(0xFF3F37C9)    // 主色变体 - Darker Indigo
+val Secondary = Color(0xFF4895EF)         // 次要色 - Vibrant Blue
+val SecondaryVariant = Color(0xFF4CC9F0)  // 次要色变体 - Light Blue
 
 /**
  * 背景色
@@ -57,7 +57,7 @@ val StatusCancelled = Color(0xFFF44336)   // 已取消 - 红色
 val Divider = Color(0xFFE0E0E0)
 
 /**
- * 渐变色
+ * 渐变色 - Indigo to Vibrant Blue gradient
  */
-val GradientStart = Color(0xFF4CAF50)     // 渐变起始 - 绿色
-val GradientEnd = Color(0xFF2196F3)       // 渐变结束 - 蓝色
+val GradientStart = Color(0xFF4361EE)     // 渐变起始 - Indigo
+val GradientEnd = Color(0xFF4CC9F0)       // 渐变结束 - Light Blue

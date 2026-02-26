@@ -13,7 +13,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
@@ -37,11 +37,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// 主题色
-private val PrimaryColor = Color(0xFF5B7FFF)
-private val PrimaryDark = Color(0xFF3D5AFE)
+// 主题色 - Modern Indigo/Blue Palette
+private val PrimaryColor = Color(0xFF4361EE)
+private val PrimaryDark = Color(0xFF3F37C9)
 private val BackgroundGradientStart = Color(0xFFF8F9FF)
-private val BackgroundGradientEnd = Color(0xFFFFFFFF)
+private val BackgroundGradientEnd = Color(0xFFEDF2FA)
+private val TextSecondary = Color(0xFF94A3B8)        // Slate 400
+private val TextTertiary = Color(0xFF64748B)          // Slate 500
+private val PlaceholderColor = Color(0xFFB0BEC5)      // Blue Grey 200
 
 /**
  * 登录页面状态
@@ -65,8 +68,7 @@ fun LoginScreen(
     onTogglePasswordVisibility: () -> Unit,
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit,
-    onSkipClick: () -> Unit,
-    onCloseClick: () -> Unit
+    onBackClick: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     val scrollState = rememberScrollState()
@@ -87,32 +89,40 @@ fun LoginScreen(
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // 顶部操作栏
+            // 顶部返回
             TopBar(
-                onSkipClick = onSkipClick,
-                onCloseClick = onCloseClick
+                onBackClick = onBackClick
             )
             
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(48.dp))
             
             // Logo
             LogoSection()
             
             Spacer(modifier = Modifier.height(48.dp))
             
-            // 输入区域
-            InputSection(
-                username = uiState.username,
-                password = uiState.password,
-                isPasswordVisible = uiState.isPasswordVisible,
-                onUsernameChange = onUsernameChange,
-                onPasswordChange = onPasswordChange,
-                onTogglePasswordVisibility = onTogglePasswordVisibility,
-                onDone = {
-                    focusManager.clearFocus()
-                    onLoginClick()
+            // 输入区域包裹在悬浮卡片中
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ) {
+                Box(modifier = Modifier.padding(32.dp)) {
+                    InputSection(
+                        username = uiState.username,
+                        password = uiState.password,
+                        isPasswordVisible = uiState.isPasswordVisible,
+                        onUsernameChange = onUsernameChange,
+                        onPasswordChange = onPasswordChange,
+                        onTogglePasswordVisibility = onTogglePasswordVisibility,
+                        onDone = {
+                            focusManager.clearFocus()
+                            onLoginClick()
+                        }
+                    )
                 }
-            )
+            }
             
             // 错误信息
             AnimatedVisibility(
@@ -154,29 +164,21 @@ fun LoginScreen(
 
 @Composable
 private fun TopBar(
-    onSkipClick: () -> Unit,
-    onCloseClick: () -> Unit
+    onBackClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(top = 48.dp),
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextButton(onClick = onSkipClick) {
-            Text(
-                text = "暂不登录",
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
-        }
-        
-        IconButton(onClick = onCloseClick) {
+        IconButton(onClick = onBackClick) {
             Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "关闭",
-                tint = Color.Gray
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "返回",
+                tint = Color(0xFF1E293B),
+                modifier = Modifier.size(24.dp)
             )
         }
     }
@@ -210,7 +212,7 @@ private fun LogoSection() {
         Spacer(modifier = Modifier.height(16.dp))
         
         Text(
-            text = "协同工作系统",
+            text = "团队协作",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1A1A1A)
@@ -221,7 +223,7 @@ private fun LogoSection() {
         Text(
             text = "高效协作，轻松管理",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = TextSecondary
         )
     }
 }
@@ -246,7 +248,7 @@ private fun InputSection(
             value = username,
             onValueChange = onUsernameChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("请输入用户名/手机号") },
+            placeholder = { Text("请输入用户名/手机号", color = PlaceholderColor) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Person,
@@ -255,12 +257,12 @@ private fun InputSection(
                 )
             },
             singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryColor,
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                unfocusedBorderColor = Color(0xFFE2E8F0),
+                focusedContainerColor = Color(0xFFF8FAFC),
+                unfocusedContainerColor = Color(0xFFF8FAFC)
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -271,14 +273,14 @@ private fun InputSection(
             )
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         
         // 密码输入框
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChange,
             modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("请输入密码") },
+            placeholder = { Text("请输入密码", color = PlaceholderColor) },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
@@ -291,18 +293,18 @@ private fun InputSection(
                     Icon(
                         imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                         contentDescription = if (isPasswordVisible) "隐藏密码" else "显示密码",
-                        tint = Color.Gray
+                        tint = TextSecondary
                     )
                 }
             },
             singleLine = true,
             visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = PrimaryColor,
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                unfocusedBorderColor = Color(0xFFE2E8F0),
+                focusedContainerColor = Color(0xFFF8FAFC),
+                unfocusedContainerColor = Color(0xFFF8FAFC)
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -325,13 +327,14 @@ private fun LoginButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(56.dp),
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(26.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = PrimaryColor,
-            disabledContainerColor = Color(0xFFBDBDBD)
-        )
+            disabledContainerColor = Color(0xFFCBD5E1) // Slate 300
+        ),
+        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
     ) {
         if (isLoading) {
             CircularProgressIndicator(
@@ -342,8 +345,8 @@ private fun LoginButton(
         } else {
             Text(
                 text = "登 录",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
     }
@@ -360,16 +363,16 @@ private fun OtherLoginOptions() {
         ) {
             Divider(
                 modifier = Modifier.weight(1f),
-                color = Color(0xFFE0E0E0)
+                color = Color(0xFFE2E8F0)
             )
             Text(
                 text = "  其他登录方式  ",
-                color = Color.Gray,
+                color = TextSecondary,
                 fontSize = 12.sp
             )
             Divider(
                 modifier = Modifier.weight(1f),
-                color = Color(0xFFE0E0E0)
+                color = Color(0xFFE2E8F0)
             )
         }
         
@@ -414,7 +417,7 @@ private fun SocialLoginButton(
             Icon(
                 imageVector = icon,
                 contentDescription = label,
-                tint = Color.Gray,
+                tint = TextSecondary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -436,7 +439,7 @@ private fun BottomRegisterSection(
     ) {
         Text(
             text = "还没有账号？",
-            color = Color.Gray,
+            color = TextTertiary,
             fontSize = 14.sp
         )
         TextButton(onClick = onRegisterClick) {

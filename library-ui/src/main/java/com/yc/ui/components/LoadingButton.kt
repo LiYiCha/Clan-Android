@@ -40,7 +40,7 @@ fun LoadingButton(
             .fillMaxWidth()
             .height(48.dp),
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(50.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
     ) {
         if (isLoading) {
@@ -75,7 +75,7 @@ fun OutlinedLoadingButton(
             .fillMaxWidth()
             .height(48.dp),
         enabled = enabled && !isLoading,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(50.dp),
         contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp)
     ) {
         if (isLoading) {

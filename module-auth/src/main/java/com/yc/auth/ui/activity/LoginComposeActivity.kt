@@ -83,8 +83,7 @@ class LoginComposeActivity : ComponentActivity() {
                     },
                     onLoginClick = { showCaptchaAndLogin(uiState.username, uiState.password) },
                     onRegisterClick = { /* TODO: 跳转注册页 */ },
-                    onSkipClick = { navigateToHome() },
-                    onCloseClick = { finish() }
+                    onBackClick = { finish() }
                 )
             }
         }
